@@ -7,11 +7,12 @@ Promise.all([
     fetch('translations/translations.es.json'),
 ].map((req) => req.then((res) => res.json())))
     .then(([langEn, langEs]) => {
+        console.log({ langEn, langEs })
         const app = (window as any).Elm.Main.init({
-            flags: JSON.stringify({
+            flags: {
                 langEn,
                 langEs
-            }),
+            },
             node
         })
 

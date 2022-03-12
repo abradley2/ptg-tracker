@@ -4,58 +4,65 @@ import Accessibility.Styled as H exposing (toUnstyled)
 import Browser exposing (document)
 import Css exposing (..)
 import Html.Styled.Attributes as A
-import Html.Styled.Events as E
 import I18Next exposing (Translations)
 import Json.Decode as Decode exposing (Decoder, Value, decodeValue)
 import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
+import Language exposing (Language, LanguageId(..))
 import OrderOfBattle
 import Platform exposing (Program)
 import Result.Extra as ResultX
 import Roster
 import TextInput
 import Theme
+import Translations.Roster
 
 
 type Msg
     = OrderOfBattleMsg OrderOfBattle.Msg
     | RosterMsg Roster.Msg
+    | SetLanguage LanguageId
 
 
 type alias Flags =
-    { langEn : Translations
-    , langEs : Translations
-    }
+    { languages : List Language }
 
 
 flagsDecoder : Decoder Flags
 flagsDecoder =
-    Decode.map2
+    Decode.map
         Flags
-        (Decode.field "langEn" I18Next.translationsDecoder)
-        (Decode.field "langEs" I18Next.translationsDecoder)
+        (Decode.map2
+            (\langEn langEs -> [ langEn, langEs ])
+            (Decode.field "langEn" I18Next.translationsDecoder
+                |> Decode.map (\translations -> ( En, translations ))
+            )
+            (Decode.field "langEs" I18Next.translationsDecoder
+                |> Decode.map (\translations -> ( Es, translations ))
+            )
+        )
 
 
 defaultFlags : Flags
 defaultFlags =
-    { langEn = I18Next.initialTranslations
-    , langEs = I18Next.initialTranslations
-    }
+    { languages = [] }
 
 
 type alias Model =
     { initError : Maybe Decode.Error
     , flags : Flags
+    , translations : List Translations
     , orderOfBattle : OrderOfBattle.Model
     , roster : Roster.Model
     }
 
 
-modelDecoder : Decoder Model
-modelDecoder =
+modelDecoder : Model -> Decoder Model
+modelDecoder initModel =
     Decode.succeed Model
-        |> DecodeX.andMap (Decode.succeed Nothing)
-        |> DecodeX.andMap (Decode.succeed defaultFlags)
+        |> DecodeX.andMap (Decode.succeed initModel.initError)
+        |> DecodeX.andMap (Decode.succeed initModel.flags)
+        |> DecodeX.andMap (Decode.succeed initModel.translations)
         |> DecodeX.andMap (Decode.field "orderOfBattle" OrderOfBattle.modelDecoder)
         |> DecodeX.andMap (Decode.field "roster" Roster.modelDecoder)
 
@@ -98,7 +105,7 @@ body model =
                     , overflow auto
                     ]
                 ]
-                [ rosterForm model.roster
+                [ rosterForm model.translations model.roster
                     |> H.map RosterMsg
                 ]
             ]
@@ -106,8 +113,8 @@ body model =
     ]
 
 
-rosterForm : Roster.Model -> H.Html Roster.Msg
-rosterForm model =
+rosterForm : List Translations -> Roster.Model -> H.Html Roster.Msg
+rosterForm translations model =
     let
         textInputWrapper =
             List.singleton
@@ -131,7 +138,7 @@ rosterForm model =
                         Roster.PlayerName playerName ->
                             playerName
               , onChange = Roster.PlayerName >> Roster.PlayerNameChanged
-              , label = "Player Name"
+              , label = Translations.Roster.playerName translations
               , id = "player-name"
               }
             , { value =
@@ -139,7 +146,7 @@ rosterForm model =
                         Roster.ArmyName armyName ->
                             armyName
               , onChange = Roster.ArmyName >> Roster.ArmyNameChanged
-              , label = "Army Name"
+              , label = Translations.Roster.armyName translations
               , id = "army-name"
               }
             , { value =
@@ -147,7 +154,7 @@ rosterForm model =
                         Roster.Faction faction ->
                             faction
               , onChange = Roster.Faction >> Roster.FactionChanged
-              , label = "Faction"
+              , label = Translations.Roster.faction translations
               , id = "faction"
               }
             , { value =
@@ -155,7 +162,7 @@ rosterForm model =
                         Roster.SubFaction subFaction ->
                             subFaction
               , onChange = Roster.SubFaction >> Roster.SubFactionChanged
-              , label = "Subfaction"
+              , label = Translations.Roster.subFaction translations
               , id = "sub-faction"
               }
             ]
@@ -172,6 +179,10 @@ init value =
     in
     ( { initError = ResultX.error flagsDecodeResult
       , flags = flags
+      , translations =
+            Language.toTranslations
+                En
+                flags.languages
       , orderOfBattle = OrderOfBattle.init
       , roster = Roster.init
       }
@@ -182,6 +193,11 @@ init value =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        SetLanguage primaryLanguageId ->
+            ( { model | translations = Language.toTranslations primaryLanguageId model.flags.languages }
+            , Cmd.none
+            )
+
         OrderOfBattleMsg orderOfBattleMsg ->
             ( { model | orderOfBattle = OrderOfBattle.update orderOfBattleMsg model.orderOfBattle }
             , Cmd.none
