@@ -1,7 +1,6 @@
 module Language exposing (..)
 
 import I18Next exposing (Translations)
-import TextInput exposing (Config)
 
 
 type LanguageId
@@ -11,12 +10,6 @@ type LanguageId
 
 type alias Language =
     ( LanguageId, Translations )
-
-
-type alias Config =
-    { primaryLanguageId : LanguageId
-    , fallbackLanguageId : LanguageId
-    }
 
 
 toTranslations : LanguageId -> List Language -> List Translations

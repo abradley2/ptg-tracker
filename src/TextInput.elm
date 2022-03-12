@@ -26,8 +26,6 @@ view config =
             [ display inlineFlex
             , flexDirection column
             , alignItems stretch
-            , flexShrink <| num 0
-            , flexGrow <| num 0
             ]
         ]
         [ H.label
@@ -39,6 +37,8 @@ view config =
                 , color Theme.softBlack
                 , padding2 (px 8) (px 16)
                 , fontWeight normal
+                , borderBottom3 (px 1) solid Theme.darkGreen
+                , borderTop3 (px 1) solid Theme.darkGreen
                 ]
             ]
             [ H.text config.label
