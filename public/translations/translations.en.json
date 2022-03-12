@@ -1,0 +1,11 @@
+{
+    "roster": {
+        "playerName": "Player Name",
+        "armyName": "Army Name",
+        "armySize": "Army Size",
+        "faction": "Faction",
+        "subFaction": "Sub Faction",
+        "realmOfOrigin": "Realm of Origin",
+        "startingSize": "Starting Size"
+    }
+}
