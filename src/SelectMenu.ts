@@ -96,7 +96,7 @@ export class SelectMenu extends HTMLElement {
 
         this.onDisconnect = () => {
           document.removeEventListener('keydown', handleKeyPress)
-          this.removeEventListener('click', handleOutsideClick)
+          document.removeEventListener('click', handleOutsideClick)
           this.onDisconnect = undefined
         }
       }

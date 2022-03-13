@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Accessibility.Styled as H exposing (toUnstyled)
-import Accessibility.Styled.Role
 import Browser exposing (document)
 import Css exposing (..)
 import Html.Styled.Attributes as A
@@ -9,6 +8,7 @@ import I18Next exposing (Translations)
 import Json.Decode as Decode exposing (Decoder, Value, decodeValue)
 import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
+import Json.EncodeX as EncodeX
 import Language exposing (Language, LanguageId(..))
 import OrderOfBattle
 import Platform exposing (Program)
@@ -173,15 +173,15 @@ rosterForm translations model =
                     { id = "realm-of-origin"
                     , selectedItemLabel =
                         Maybe.map
-                            (Roster.realmOfOriginEncoder >> Encode.encode 0)
+                            (Roster.realmOfOriginEncoder >> EncodeX.encodeString)
                             model.realmOfOrigin
                     , items =
                         [ { id = Roster.realmOfOriginId "realm-of-origin" Roster.Azir
-                          , label = Roster.Azir |> Roster.realmOfOriginEncoder |> Encode.encode 0
+                          , label = Roster.Azir |> Roster.realmOfOriginEncoder |> EncodeX.encodeString
                           , value = Roster.Azir
                           }
                         , { id = Roster.realmOfOriginId "realm-of-origin" Roster.Shyish
-                          , label = Roster.Shyish |> Roster.realmOfOriginEncoder |> Encode.encode 0
+                          , label = Roster.Shyish |> Roster.realmOfOriginEncoder |> EncodeX.encodeString
                           , value = Roster.Shyish
                           }
                         ]
@@ -193,23 +193,23 @@ rosterForm translations model =
                     { id = "starting-size"
                     , selectedItemLabel =
                         Maybe.map
-                            (Roster.startingSizeEncoder >> Encode.encode 0)
+                            (Roster.startingSizeEncoder >> EncodeX.encodeString)
                             model.startingSize
                     , items =
                         [ { id = Roster.startingSizeId "starting-size" Roster.Size600
-                          , label = Roster.Size600 |> Roster.startingSizeEncoder |> Encode.encode 0
+                          , label = Roster.Size600 |> Roster.startingSizeEncoder |> EncodeX.encodeString
                           , value = Roster.Size600
                           }
                         , { id = Roster.startingSizeId "starting-size" Roster.Size1000
-                          , label = Roster.Size1000 |> Roster.startingSizeEncoder |> Encode.encode 0
+                          , label = Roster.Size1000 |> Roster.startingSizeEncoder |> EncodeX.encodeString
                           , value = Roster.Size1000
                           }
                         , { id = Roster.startingSizeId "starting-size" Roster.Size1500
-                          , label = Roster.Size1500 |> Roster.startingSizeEncoder |> Encode.encode 0
+                          , label = Roster.Size1500 |> Roster.startingSizeEncoder |> EncodeX.encodeString
                           , value = Roster.Size1500
                           }
                         , { id = Roster.startingSizeId "starting-size" Roster.Size2000
-                          , label = Roster.Size2000 |> Roster.startingSizeEncoder |> Encode.encode 0
+                          , label = Roster.Size2000 |> Roster.startingSizeEncoder |> EncodeX.encodeString
                           , value = Roster.Size2000
                           }
                         ]

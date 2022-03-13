@@ -98,11 +98,15 @@ view model config =
             , A.css
                 [ minHeight <| px 38
                 , maxHeight <| px 38
+                , padding2 (px 8) (px 16)
                 , borderWidth <| px 0
                 , backgroundColor Theme.white
                 , cursor pointer
                 , position relative
                 , textAlign left
+                , focus
+                    [ outline3 (px 1) solid Theme.darkGreen
+                    ]
                 ]
             ]
             [ H.span
@@ -198,6 +202,11 @@ option config model index optionConfig =
             , padding2 (px 8) (px 16)
             , borderWidth (px 0)
             , borderBottom3 (px 1) solid Theme.darkGreen
+            , cursor pointer
+            , hover
+                [ backgroundColor Theme.lightGreen
+                , color Theme.white
+                ]
             ]
                 ++ (if index == model.focusIndex then
                         [ backgroundColor Theme.lightGreen
