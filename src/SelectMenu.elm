@@ -61,7 +61,6 @@ view model config =
             if menuOpen then
                 A.css
                     [ maxHeight <| px 400
-                    , minHeight <| px 400
                     , overflow auto
                     , Theme.boxShadowLight
                     ]
@@ -149,7 +148,7 @@ view model config =
                 , top <| pct 100
                 , left <| px 0
                 , right <| px 0
-                , marginTop <| px 8
+                , marginTop <| px 4
                 , backgroundColor Theme.white
                 ]
             , focusMenuClass model.menuOpen
@@ -191,10 +190,14 @@ option config model index optionConfig =
     H.button
         [ Role.option
         , A.id optionConfig.id
+        , A.tabindex <| -1
         , E.onClick (config.onItemSelected optionConfig.value)
         , A.css <|
             [ width <| pct 100
             , backgroundColor Theme.white
+            , padding2 (px 8) (px 16)
+            , borderWidth (px 0)
+            , borderBottom3 (px 1) solid Theme.darkGreen
             ]
                 ++ (if index == model.focusIndex then
                         [ backgroundColor Theme.lightGreen

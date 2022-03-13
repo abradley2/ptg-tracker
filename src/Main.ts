@@ -18,6 +18,4 @@ Promise.all([
       },
       node
     })
-
-    console.log(app)
   })

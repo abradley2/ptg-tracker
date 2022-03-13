@@ -249,10 +249,22 @@ update msg model =
             { model | subFaction = subFaction }
 
         RealmOfOriginChanged realmOfOrigin ->
-            { model | realmOfOrigin = Just realmOfOrigin }
+            { model
+                | realmOfOrigin = Just realmOfOrigin
+                , realmOfOriginSelectMenu =
+                    SelectMenu.update
+                        (SelectMenu.MenuToggled False)
+                        model.realmOfOriginSelectMenu
+            }
 
         StartingSizeChanged startingSize ->
-            { model | startingSize = Just startingSize }
+            { model
+                | startingSize = Just startingSize
+                , startingSizeSelectMenu =
+                    SelectMenu.update
+                        (SelectMenu.MenuToggled False)
+                        model.startingSizeSelectMenu
+            }
 
         RealmOfOriginSelectMenuMsg selectMenuMsg ->
             { model

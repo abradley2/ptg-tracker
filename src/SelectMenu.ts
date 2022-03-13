@@ -10,6 +10,10 @@ export class SelectMenu extends HTMLElement {
     if (this.onDisconnect != null) this.onDisconnect()
   }
 
+  connectedCallback(): void {
+    this.setAttribute('tabindex', '-1')
+  }
+
   attributeChangedCallback(name: string, oldVal: string, newVal: string): void {
     const children = this.children
 
@@ -17,7 +21,6 @@ export class SelectMenu extends HTMLElement {
       const show = newVal === 'true'
 
       if (!show) {
-        this.tabIndex = -1
         this.focusIndex = undefined
 
         if (this.onDisconnect != null) {
@@ -30,11 +33,6 @@ export class SelectMenu extends HTMLElement {
         if (typeof this.focusIndex === 'undefined') {
           this.focusIndex = -1
         }
-
-
-
-        this.tabIndex = 0
-        this.focus()
 
         const handleKeyPress = (e: KeyboardEvent) => {
           const focusIndex = this.focusIndex as number
