@@ -3,6 +3,7 @@ module Roster exposing (..)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
+import SelectMenu
 
 
 type PlayerName
@@ -177,9 +178,9 @@ type alias Model =
     , faction : Faction
     , subFaction : SubFaction
     , realmOfOrigin : Maybe RealmOfOrigin
-    , realmOfOriginSelectOpen : Bool
+    , realmOfOriginSelectMenu : SelectMenu.Model
     , startingSize : Maybe StartingSize
-    , startingSizeSelectOpen : Bool
+    , startingSizeSelectMenu : SelectMenu.Model
     }
 
 
@@ -191,9 +192,9 @@ modelDecoder =
         |> DecodeX.andMap (Decode.field "faction" factionDecoder)
         |> DecodeX.andMap (Decode.field "subFaction" subFactionDecoder)
         |> DecodeX.andMap (Decode.field "realmOfOrigin" realmOfOriginDecoder |> Decode.nullable)
-        |> DecodeX.andMap (Decode.succeed False)
+        |> DecodeX.andMap (Decode.succeed SelectMenu.init)
         |> DecodeX.andMap (Decode.field "startingSize" startingSizeDecoder |> Decode.nullable)
-        |> DecodeX.andMap (Decode.succeed False)
+        |> DecodeX.andMap (Decode.succeed SelectMenu.init)
 
 
 modelEncoder : Model -> Value
@@ -214,9 +215,9 @@ type Msg
     | FactionChanged Faction
     | SubFactionChanged SubFaction
     | RealmOfOriginChanged RealmOfOrigin
-    | RealmOfOriginSelectToggled Bool
+    | RealmOfOriginSelectMenuMsg SelectMenu.Msg
     | StartingSizeChanged StartingSize
-    | StartingSizeSelectToggled Bool
+    | StartingSizeSelectMenuMsg SelectMenu.Msg
 
 
 init : Model
@@ -226,9 +227,9 @@ init =
     , faction = Faction ""
     , subFaction = SubFaction ""
     , realmOfOrigin = Nothing
-    , realmOfOriginSelectOpen = False
+    , realmOfOriginSelectMenu = SelectMenu.init
     , startingSize = Nothing
-    , startingSizeSelectOpen = False
+    , startingSizeSelectMenu = SelectMenu.init
     }
 
 
@@ -253,8 +254,11 @@ update msg model =
         StartingSizeChanged startingSize ->
             { model | startingSize = Just startingSize }
 
-        RealmOfOriginSelectToggled realmOfOriginSelectOpen ->
-            { model | realmOfOriginSelectOpen = realmOfOriginSelectOpen }
+        RealmOfOriginSelectMenuMsg selectMenuMsg ->
+            { model
+                | realmOfOriginSelectMenu =
+                    SelectMenu.update selectMenuMsg model.realmOfOriginSelectMenu
+            }
 
-        StartingSizeSelectToggled startingSizeSelectOpen ->
-            { model | startingSizeSelectOpen = startingSizeSelectOpen }
+        StartingSizeSelectMenuMsg selectMenuMsg ->
+            { model | startingSizeSelectMenu = SelectMenu.update selectMenuMsg model.startingSizeSelectMenu }

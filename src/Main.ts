@@ -1,10 +1,10 @@
-import { FocusMenu } from './FocusMenu'
+import { SelectMenu } from './SelectMenu'
 
 const node = document.createElement('div')
 
 document.body.appendChild(node)
 
-window.customElements.define('focus-menu', FocusMenu)
+window.customElements.define('select-menu', SelectMenu)
 
 Promise.all([
   fetch('translations/translations.en.json'),

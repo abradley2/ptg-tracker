@@ -14,7 +14,7 @@ import OrderOfBattle
 import Platform exposing (Program)
 import Result.Extra as ResultX
 import Roster
-import Select
+import SelectMenu
 import TextInput
 import Theme
 import Translations.Roster
@@ -168,53 +168,55 @@ rosterForm translations model =
               , id = "sub-faction"
               }
             ]
-            ++ List.map (Select.view >> textInputWrapper)
-                [ { id = "realm-of-origin"
-                  , selectedItemLabel =
+            ++ List.map textInputWrapper
+                [ SelectMenu.view model.realmOfOriginSelectMenu
+                    { id = "realm-of-origin"
+                    , selectedItemLabel =
                         Maybe.map
                             (Roster.realmOfOriginEncoder >> Encode.encode 0)
                             model.realmOfOrigin
-                  , items =
+                    , items =
                         [ { id = Roster.realmOfOriginId "realm-of-origin" Roster.Azir
                           , label = Roster.Azir |> Roster.realmOfOriginEncoder |> Encode.encode 0
-                          , onSelect = Roster.RealmOfOriginChanged Roster.Azir
+                          , value = Roster.Azir
                           }
                         , { id = Roster.realmOfOriginId "realm-of-origin" Roster.Shyish
                           , label = Roster.Shyish |> Roster.realmOfOriginEncoder |> Encode.encode 0
-                          , onSelect = Roster.RealmOfOriginChanged Roster.Shyish
+                          , value = Roster.Shyish
                           }
                         ]
-                  , label = Translations.Roster.realmOfOrigin translations
-                  , menuOpen = model.realmOfOriginSelectOpen
-                  , onToggleMenu = Roster.RealmOfOriginSelectToggled
-                  }
-                , { id = "starting-size"
-                  , selectedItemLabel =
+                    , label = Translations.Roster.realmOfOrigin translations
+                    , onItemSelected = Roster.RealmOfOriginChanged
+                    , toMsg = Roster.RealmOfOriginSelectMenuMsg
+                    }
+                , SelectMenu.view model.startingSizeSelectMenu
+                    { id = "starting-size"
+                    , selectedItemLabel =
                         Maybe.map
                             (Roster.startingSizeEncoder >> Encode.encode 0)
                             model.startingSize
-                  , items =
+                    , items =
                         [ { id = Roster.startingSizeId "starting-size" Roster.Size600
                           , label = Roster.Size600 |> Roster.startingSizeEncoder |> Encode.encode 0
-                          , onSelect = Roster.StartingSizeChanged Roster.Size600
+                          , value = Roster.Size600
                           }
                         , { id = Roster.startingSizeId "starting-size" Roster.Size1000
                           , label = Roster.Size1000 |> Roster.startingSizeEncoder |> Encode.encode 0
-                          , onSelect = Roster.StartingSizeChanged Roster.Size1000
+                          , value = Roster.Size1000
                           }
                         , { id = Roster.startingSizeId "starting-size" Roster.Size1500
                           , label = Roster.Size1500 |> Roster.startingSizeEncoder |> Encode.encode 0
-                          , onSelect = Roster.StartingSizeChanged Roster.Size1500
+                          , value = Roster.Size1500
                           }
                         , { id = Roster.startingSizeId "starting-size" Roster.Size2000
                           , label = Roster.Size2000 |> Roster.startingSizeEncoder |> Encode.encode 0
-                          , onSelect = Roster.StartingSizeChanged Roster.Size2000
+                          , value = Roster.Size2000
                           }
                         ]
-                  , label = Translations.Roster.startingSize translations
-                  , menuOpen = model.startingSizeSelectOpen
-                  , onToggleMenu = Roster.StartingSizeSelectToggled
-                  }
+                    , label = Translations.Roster.startingSize translations
+                    , onItemSelected = Roster.StartingSizeChanged
+                    , toMsg = Roster.StartingSizeSelectMenuMsg
+                    }
                 ]
 
 

@@ -27,33 +27,40 @@ export class SelectMenu extends HTMLElement {
       }
 
       if (show) {
-        this.focusIndex = -1
-        const focusIndex = this.focusIndex as number
+        if (typeof this.focusIndex === 'undefined') {
+          this.focusIndex = -1
+        }
+
+
 
         this.tabIndex = 0
         this.focus()
 
         const handleKeyPress = (e: KeyboardEvent) => {
+          const focusIndex = this.focusIndex as number
           const activeElement = document.activeElement as Element
 
+
           if (e.key === 'ArrowUp') {
-            if (this.children[focusIndex + 1]) {
-              this.focusIndex = focusIndex + 1
+            if (this.childNodes[focusIndex - 1]) {
+              this.focusIndex = focusIndex - 1
             }
 
             const ev = new CustomEvent('focusindexchanged', {
-              detail: this.focusIndex
+              detail: this.focusIndex,
+              bubbles: true
             })
 
             this.dispatchEvent(ev)
           }
           if (e.key === 'ArrowDown') {
-            if (this.children[focusIndex - 1]) {
+            if (this.childNodes[focusIndex + 1]) {
               this.focusIndex = focusIndex + 1
             }
 
             const ev = new CustomEvent('focusindexchanged', {
-              detail: this.focusIndex
+              detail: this.focusIndex,
+              bubbles: true
             })
 
             this.dispatchEvent(ev)
@@ -61,15 +68,29 @@ export class SelectMenu extends HTMLElement {
 
           if (e.key === 'Enter') {
             const ev = new CustomEvent('itemselected', {
-              bubbles: true
+              bubbles: true,
+              detail: this.focusIndex
             })
 
             this.dispatchEvent(ev)
+            this.dispatchEvent(new CustomEvent('requestedclose'))
+            const controller = document.querySelector('[aria-controls="' + this.id + '"]') as HTMLElement
+            if (controller) controller.focus()
           }
         }
 
         const handleOutsideClick = (e: MouseEvent) => {
+          if (e.target === this || this.contains(e.target as Node)) {
+            return
+          }
 
+          if (e.target !== null && (e.target as Element).getAttribute('aria-controls') === this.getAttribute('id')) {
+            return
+          }
+
+          const ev = new CustomEvent('requestedclose')
+
+          this.dispatchEvent(ev)
         }
 
         document.addEventListener('keydown', handleKeyPress)
