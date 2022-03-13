@@ -1,27 +1,28 @@
 {
-    "name": "ptg-tracker",
-    "version": "1.0.0",
-    "main": "index.js",
-    "scripts": {
-        "test": "elm-review",
-        "build": "npm run build:translations &&npm run build:ts && npm run build:elm",
-        "build:ts": "browserify src/Main.ts -p tsify -o public/main.bundle.js",
-        "build:elm": "elm make src/Main.elm --debug --output=public/app.bundle.js",
-        "build:translations": "rm -rf src/I18Next && elm-i18next-gen --source public/translations/translations.en.json --target src --overwrite --fallback"
-    },
-    "author": "",
-    "license": "ISC",
-    "description": "",
-    "dependencies": {
-        "@typescript-eslint/parser": "^4.0.0",
-        "browserify": "^17.0.0",
-        "elm-i18next-gen": "^1.1.0",
-        "elm-json": "^0.2.12",
-        "elm-review": "^2.7.0",
-        "elm-test": "^0.19.1-revision7",
-        "eslint": "^7.0.0",
-        "ts-standard": "^11.0.0",
-        "tsify": "^5.0.4",
-        "typescript": "^4.6.2"
-    }
+  "name": "ptg-tracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "elm-review",
+    "build": "npm run build:translations &&npm run build:ts && npm run build:elm",
+    "build:ts": "browserify src/Main.ts -p tsify -o public/main.bundle.js",
+    "build:elm": "elm make src/Main.elm --debug --output=public/app.bundle.js",
+    "build:translations": "rm -rf src/I18Next && elm-i18next-gen --source public/translations/translations.en.json --target src --overwrite --fallback",
+    "lint": "elm-format --yes src/ && ts-standard --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@typescript-eslint/parser": "^4.0.0",
+    "browserify": "^17.0.0",
+    "elm-i18next-gen": "^1.1.0",
+    "elm-json": "^0.2.12",
+    "elm-review": "^2.7.0",
+    "elm-test": "^0.19.1-revision7",
+    "eslint": "^7.0.0",
+    "ts-standard": "^11.0.0",
+    "tsify": "^5.0.4",
+    "typescript": "^4.4.0"
+  }
 }

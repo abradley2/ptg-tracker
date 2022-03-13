@@ -1,5 +1,4 @@
 elm-stuff
 *.bundle.*
-node_modules
-
+.vscode/
 node_modules/
