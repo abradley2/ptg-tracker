@@ -2,18 +2,18 @@ module Select exposing (..)
 
 import Accessibility.Styled as H
 import Accessibility.Styled.Aria as Aria
+import Accessibility.Styled.Role as Role
 import Css exposing (..)
 import FocusMenu
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
+import Icon
 import Theme
 
 
-type alias Config item msg =
-    { items : List item
-    , itemLabel : item -> String
-    , onSelect : item -> msg
-    , selectedItem : Maybe item
+type alias Config msg =
+    { items : List (OptionConfig msg)
+    , selectedItemLabel : Maybe String
     , id : String
     , label : String
     , onToggleMenu : Bool -> msg
@@ -21,7 +21,7 @@ type alias Config item msg =
     }
 
 
-view : Config item msg -> H.Html msg
+view : Config msg -> H.Html msg
 view config =
     let
         menuId =
@@ -31,7 +31,9 @@ view config =
             if menuOpen then
                 A.css
                     [ maxHeight <| px 400
+                    , minHeight <| px 400
                     , overflow auto
+                    , Theme.boxShadowLight
                     ]
 
             else
@@ -45,30 +47,67 @@ view config =
             [ display inlineFlex
             , flexDirection column
             , position relative
+            , width <| px 254
             ]
         ]
         [ H.label
             [ A.id config.id
+            , A.css
+                [ padding2 (px 8) (px 16)
+                , backgroundColor Theme.lightGreen
+                , borderBottom3 (px 1) solid Theme.darkGreen
+                , borderTop3 (px 1) solid Theme.darkGreen
+                ]
             ]
             [ H.text config.label
             ]
         , H.button
             [ Aria.controls [ menuId ]
-            , Aria.labeledBy config.id
+            , Aria.labelledBy config.id
+            , Aria.hasListBoxPopUp
             , E.onClick (config.onToggleMenu <| not config.menuOpen)
             , A.css
                 [ minHeight <| px 38
                 , maxHeight <| px 38
                 , borderWidth <| px 0
+                , backgroundColor Theme.white
+                , cursor pointer
+                , position relative
+                , textAlign left
                 ]
             ]
-            [ Maybe.map config.itemLabel config.selectedItem
-                |> Maybe.withDefault ""
-                |> H.text
+            [ H.span
+                [ A.id <| config.id ++ "-selection" ]
+                [ config.selectedItemLabel
+                    |> Maybe.withDefault ""
+                    |> H.text
+                ]
+            , H.div
+                [ A.css
+                    [ position absolute
+                    , right <| px 4
+                    , top <| px 0
+                    , bottom <| px 0
+                    , displayFlex
+                    , alignItems center
+                    , pointerEvents none
+                    ]
+                ]
+                [ H.div
+                    [ A.css
+                        [ width <| px 32
+                        , height <| px 32
+                        , color Theme.darkGrey
+                        ]
+                    ]
+                    [ Icon.expandMore
+                    ]
+                ]
             ]
         , FocusMenu.view
             { additionalAttributes =
                 [ A.id menuId
+                , Role.listBox
                 , A.css
                     [ position absolute
                     , top <| pct 100
@@ -83,13 +122,26 @@ view config =
             , show = config.menuOpen
             }
           <|
-            List.map (option config) config.items
+            List.map option config.items
         ]
 
 
-option : Config item msg -> item -> H.Html msg
-option config item =
+type alias OptionConfig msg =
+    { id : String
+    , label : String
+    , onSelect : msg
+    }
+
+
+option : OptionConfig msg -> H.Html msg
+option config =
     H.button
-        []
-        [ H.text <| config.itemLabel item
+        [ Role.option
+        , A.id config.id
+        , E.onClick config.onSelect
+        , A.css
+            [ width <| pct 100
+            ]
+        ]
+        [ H.text config.label
         ]

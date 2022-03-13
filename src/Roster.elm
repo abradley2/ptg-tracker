@@ -66,6 +66,19 @@ type RealmOfOrigin
     | Azir
 
 
+realmOfOriginId : String -> RealmOfOrigin -> String
+realmOfOriginId prefix realmOfOrigin =
+    prefix
+        ++ "-"
+        ++ (case realmOfOrigin of
+                Shyish ->
+                    "shyish"
+
+                Azir ->
+                    "azir"
+           )
+
+
 realmOfOriginDecoder : Decoder RealmOfOrigin
 realmOfOriginDecoder =
     Decode.andThen
@@ -94,11 +107,29 @@ realmOfOriginEncoder realmOfOrigin =
 
 
 type StartingSize
-    = Size500
-    | Size700
+    = Size600
     | Size1000
     | Size1500
     | Size2000
+
+
+startingSizeId : String -> StartingSize -> String
+startingSizeId prefix startingSize =
+    prefix
+        ++ "-"
+        ++ (case startingSize of
+                Size600 ->
+                    "size-600"
+
+                Size1000 ->
+                    "size-1000"
+
+                Size1500 ->
+                    "size-1500"
+
+                Size2000 ->
+                    "size-2000"
+           )
 
 
 startingSizeDecoder : Decoder StartingSize
@@ -106,19 +137,16 @@ startingSizeDecoder =
     Decode.andThen
         (\val ->
             case val of
-                "Size500" ->
-                    Decode.succeed Size500
+                "600" ->
+                    Decode.succeed Size600
 
-                "Size700" ->
-                    Decode.succeed Size700
-
-                "Size1000" ->
+                "1000" ->
                     Decode.succeed Size1000
 
-                "Size1500" ->
+                "1500" ->
                     Decode.succeed Size1500
 
-                "Size2000" ->
+                "2000" ->
                     Decode.succeed Size2000
 
                 _ ->
@@ -130,20 +158,17 @@ startingSizeDecoder =
 startingSizeEncoder : StartingSize -> Value
 startingSizeEncoder startingSize =
     case startingSize of
-        Size500 ->
-            Encode.string "Size500"
-
-        Size700 ->
-            Encode.string "Size700"
+        Size600 ->
+            Encode.string "600"
 
         Size1000 ->
-            Encode.string "Size1000"
+            Encode.string "1000"
 
         Size1500 ->
-            Encode.string "Size1500"
+            Encode.string "1500"
 
         Size2000 ->
-            Encode.string "Size2000"
+            Encode.string "2000"
 
 
 type alias Model =
