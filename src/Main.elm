@@ -13,6 +13,7 @@ import OrderOfBattle
 import Platform exposing (Program)
 import Result.Extra as ResultX
 import Roster
+import Select
 import TextInput
 import Theme
 import Translations.Roster
@@ -166,6 +167,17 @@ rosterForm translations model =
               , id = "sub-faction"
               }
             ]
+            ++ List.map (Select.view >> textInputWrapper)
+                [ { id = "realm-of-orgin"
+                  , itemLabel = always "Hello"
+                  , items = []
+                  , label = Translations.Roster.realmOfOrigin translations
+                  , menuOpen = model.realmOfOriginSelectOpen
+                  , onSelect = Roster.RealmOfOriginChanged
+                  , onToggleMenu = Roster.RealmOfOriginSelectToggled
+                  , selectedItem = model.realmOfOrigin
+                  }
+                ]
 
 
 init : Value -> ( Model, Cmd Msg )
@@ -222,7 +234,7 @@ main =
         , subscriptions = subscriptions
         , view =
             \model ->
-                { title = "PtG Trackeer"
+                { title = "PtG Tracker"
                 , body = List.map toUnstyled (body model)
                 }
         }

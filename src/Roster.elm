@@ -1,6 +1,7 @@
 module Roster exposing (..)
 
 import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
 
 
@@ -150,21 +151,24 @@ type alias Model =
     , armyName : ArmyName
     , faction : Faction
     , subFaction : SubFaction
-    , realmOfOrigin : RealmOfOrigin
-    , startingSize : StartingSize
+    , realmOfOrigin : Maybe RealmOfOrigin
+    , realmOfOriginSelectOpen : Bool
+    , startingSize : Maybe StartingSize
+    , startingSizeSelectOpen : Bool
     }
 
 
 modelDecoder : Decoder Model
 modelDecoder =
-    Decode.map6
-        Model
-        (Decode.field "playerName" playerNameDecoder)
-        (Decode.field "armyName" armyNameDecoder)
-        (Decode.field "faction" factionDecoder)
-        (Decode.field "subFaction" subFactionDecoder)
-        (Decode.field "realmOfOrigin" realmOfOriginDecoder)
-        (Decode.field "startingSize" startingSizeDecoder)
+    Decode.succeed Model
+        |> DecodeX.andMap (Decode.field "playerName" playerNameDecoder)
+        |> DecodeX.andMap (Decode.field "armyName" armyNameDecoder)
+        |> DecodeX.andMap (Decode.field "faction" factionDecoder)
+        |> DecodeX.andMap (Decode.field "subFaction" subFactionDecoder)
+        |> DecodeX.andMap (Decode.field "realmOfOrigin" realmOfOriginDecoder |> Decode.nullable)
+        |> DecodeX.andMap (Decode.succeed False)
+        |> DecodeX.andMap (Decode.field "startingSize" startingSizeDecoder |> Decode.nullable)
+        |> DecodeX.andMap (Decode.succeed False)
 
 
 modelEncoder : Model -> Value
@@ -174,8 +178,8 @@ modelEncoder model =
         , ( "armyName", armyNameEncoder model.armyName )
         , ( "faction", factionEncoder model.faction )
         , ( "subFaction", subFactionEncoder model.subFaction )
-        , ( "realmOfOrigin", realmOfOriginEncoder model.realmOfOrigin )
-        , ( "startingSize", startingSizeEncoder model.startingSize )
+        , ( "realmOfOrigin", Maybe.map realmOfOriginEncoder model.realmOfOrigin |> Maybe.withDefault Encode.null )
+        , ( "startingSize", Maybe.map startingSizeEncoder model.startingSize |> Maybe.withDefault Encode.null )
         ]
 
 
@@ -185,7 +189,9 @@ type Msg
     | FactionChanged Faction
     | SubFactionChanged SubFaction
     | RealmOfOriginChanged RealmOfOrigin
+    | RealmOfOriginSelectToggled Bool
     | StartingSizeChanged StartingSize
+    | StartingSizeSelectToggled Bool
 
 
 init : Model
@@ -194,8 +200,10 @@ init =
     , armyName = ArmyName ""
     , faction = Faction ""
     , subFaction = SubFaction ""
-    , realmOfOrigin = Shyish
-    , startingSize = Size500
+    , realmOfOrigin = Nothing
+    , realmOfOriginSelectOpen = False
+    , startingSize = Nothing
+    , startingSizeSelectOpen = False
     }
 
 
@@ -215,7 +223,13 @@ update msg model =
             { model | subFaction = subFaction }
 
         RealmOfOriginChanged realmOfOrigin ->
-            { model | realmOfOrigin = realmOfOrigin }
+            { model | realmOfOrigin = Just realmOfOrigin }
 
         StartingSizeChanged startingSize ->
-            { model | startingSize = startingSize }
+            { model | startingSize = Just startingSize }
+
+        RealmOfOriginSelectToggled realmOfOriginSelectOpen ->
+            { model | realmOfOriginSelectOpen = realmOfOriginSelectOpen }
+
+        StartingSizeSelectToggled startingSizeSelectOpen ->
+            { model | startingSizeSelectOpen = startingSizeSelectOpen }

@@ -6,6 +6,7 @@ import Css exposing (..)
 import FocusMenu
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
+import Theme
 
 
 type alias Config item msg =
@@ -28,15 +29,22 @@ view config =
 
         focusMenuClass menuOpen =
             if menuOpen then
-                A.css []
+                A.css
+                    [ maxHeight <| px 400
+                    , overflow auto
+                    ]
 
             else
-                A.css []
+                A.css
+                    [ maxHeight <| px 0
+                    , overflow hidden
+                    ]
     in
     H.div
         [ A.css
             [ display inlineFlex
             , flexDirection column
+            , position relative
             ]
         ]
         [ H.label
@@ -48,6 +56,11 @@ view config =
             [ Aria.controls [ menuId ]
             , Aria.labeledBy config.id
             , E.onClick (config.onToggleMenu <| not config.menuOpen)
+            , A.css
+                [ minHeight <| px 38
+                , maxHeight <| px 38
+                , borderWidth <| px 0
+                ]
             ]
             [ Maybe.map config.itemLabel config.selectedItem
                 |> Maybe.withDefault ""
@@ -55,7 +68,17 @@ view config =
             ]
         , FocusMenu.view
             { additionalAttributes =
-                [ A.id menuId, focusMenuClass config.menuOpen ]
+                [ A.id menuId
+                , A.css
+                    [ position absolute
+                    , top <| pct 100
+                    , left <| px 0
+                    , right <| px 0
+                    , marginTop <| px 8
+                    , backgroundColor Theme.white
+                    ]
+                , focusMenuClass config.menuOpen
+                ]
             , onRequestedClose = config.onToggleMenu False
             , show = config.menuOpen
             }

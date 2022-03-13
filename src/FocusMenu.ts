@@ -10,7 +10,7 @@ class FocusMenu extends HTMLElement {
         if (this.onDisconnect) this.onDisconnect()
     }
 
-    attributeChangedCallback(name, oldVal, newVal) {
+    attributeChangedCallback(name: string, oldVal: string, newVal: string) {
         const node = this
         const children = this.children
 
@@ -18,6 +18,7 @@ class FocusMenu extends HTMLElement {
             const show = newVal === 'true'
 
             if (!show) {
+                ;[...node.children].forEach((child) => child.setAttribute('tabindex', '-1'))
                 if (node.onDisconnect) {
                     node.onDisconnect()
                     node.onDisconnect = undefined
@@ -25,27 +26,31 @@ class FocusMenu extends HTMLElement {
             }
 
             if (show) {
-                function handleKeyPress(e) {
+                ;[...node.children].forEach((child) => child.setAttribute('tabindex', '0'))
+
+                function handleKeyPress(e: KeyboardEvent) {
+                    const activeElement = document.activeElement as Element
+
                     if (e.key === 'ArrowUp') {
                         if (
-                            [...children].includes(document.activeElement) &&
-                            document.activeElement.previousSibling
+                            [...children].includes(activeElement) &&
+                            activeElement.previousElementSibling
                         ) {
-                            document.activeElement.previousSibling.focus()
+                            ; (activeElement.previousElementSibling as HTMLElement).focus()
                         }
                     }
                     if (e.key === 'ArrowDown') {
                         if (
-                            [...children].includes(document.activeElement) &&
-                            document.activeElement.nextSibling
+                            [...children].includes(activeElement) &&
+                            activeElement.nextElementSibling
                         ) {
-                            document.activeElement.nextSibling.focus()
+                            ; (activeElement.nextElementSibling as HTMLElement).focus()
                         }
                     }
                 }
 
-                function handleFocusOut(e) {
-                    if (node.contains(e.relatedTarget) || e.relatedTarget.getAttribute('aria-controls') === node.getAttribute('id')) {
+                function handleFocusOut(e: FocusEvent) {
+                    if (node.contains(e.relatedTarget as Node) || (e.relatedTarget as Element).getAttribute('aria-controls') === node.getAttribute('id')) {
                         return
                     }
                     node.dispatchEvent(new Event('requestedclose', {
@@ -64,7 +69,9 @@ class FocusMenu extends HTMLElement {
                 }
 
                 setTimeout(() => {
-                    if (node.firstChild) node.firstChild.focus()
+                    if (node.firstChild) {
+                        ; (node.firstChild as HTMLElement).focus()
+                    }
                 }, 20)
             }
         }

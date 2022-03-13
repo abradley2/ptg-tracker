@@ -48,7 +48,8 @@ view config =
             [ A.css
                 [ borderColor transparent
                 , borderWidth <| px 0
-                , padding2 (px 8) (px 16)
+                , padding2 (px 0) (px 16)
+                , height (px 38)
                 , focus
                     [ outline3 (px 1) solid Theme.darkGreen
                     ]
