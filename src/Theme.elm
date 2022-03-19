@@ -2,8 +2,6 @@ module Theme exposing (..)
 
 import Css exposing (..)
 import Css.Media as Media exposing (..)
-import Html.Styled exposing (Attribute)
-import Html.Styled.Attributes exposing (style)
 
 
 tabletUp : List Style -> Style

@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "elm-review",
-    "build": "npm run build:translations &&npm run build:ts && npm run build:elm",
+    "build": "npm run build:translations && npm run build:ts && npm run build:elm",
     "build:ts": "browserify src/Main.ts -p tsify -o public/main.bundle.js",
     "build:elm": "elm make src/Main.elm --debug --output=public/app.bundle.js",
     "build:translations": "rm -rf src/I18Next && elm-i18next-gen --source public/translations/translations.en.json --target src --overwrite --fallback",

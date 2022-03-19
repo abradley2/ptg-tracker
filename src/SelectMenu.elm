@@ -92,7 +92,7 @@ view model config =
             ]
         , H.button
             [ Aria.controls [ menuId ]
-            , Aria.labelledBy config.id
+            , Aria.labelledBy <| config.id ++ " " ++ config.id ++ "-selection"
             , Aria.hasListBoxPopUp
             , E.onClick <| config.toMsg (MenuToggled <| not model.menuOpen)
             , A.css
@@ -154,6 +154,7 @@ view model config =
                 , right <| px 0
                 , marginTop <| px 4
                 , backgroundColor Theme.white
+                , zIndex <| int 1
                 ]
             , focusMenuClass model.menuOpen
             , A.attribute "show" <|

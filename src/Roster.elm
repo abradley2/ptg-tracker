@@ -1,9 +1,17 @@
 module Roster exposing (..)
 
+import Accessibility.Styled as H
+import Css exposing (..)
+import Html.Styled.Attributes as A
+import I18Next exposing (Translations)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
+import Json.EncodeX as EncodeX
+import Roster.Vault as Vault
 import SelectMenu
+import TextInput
+import Translations.Roster
 
 
 type PlayerName
@@ -181,6 +189,7 @@ type alias Model =
     , realmOfOriginSelectMenu : SelectMenu.Model
     , startingSize : Maybe StartingSize
     , startingSizeSelectMenu : SelectMenu.Model
+    , vault : Vault.Model
     }
 
 
@@ -195,6 +204,7 @@ modelDecoder =
         |> DecodeX.andMap (Decode.succeed SelectMenu.init)
         |> DecodeX.andMap (Decode.field "startingSize" startingSizeDecoder |> Decode.nullable)
         |> DecodeX.andMap (Decode.succeed SelectMenu.init)
+        |> DecodeX.andMap (Decode.field "vault" Vault.modelDecoder)
 
 
 modelEncoder : Model -> Value
@@ -206,6 +216,7 @@ modelEncoder model =
         , ( "subFaction", subFactionEncoder model.subFaction )
         , ( "realmOfOrigin", Maybe.map realmOfOriginEncoder model.realmOfOrigin |> Maybe.withDefault Encode.null )
         , ( "startingSize", Maybe.map startingSizeEncoder model.startingSize |> Maybe.withDefault Encode.null )
+        , ( "vault", Vault.modelEncoder model.vault )
         ]
 
 
@@ -218,6 +229,7 @@ type Msg
     | RealmOfOriginSelectMenuMsg SelectMenu.Msg
     | StartingSizeChanged StartingSize
     | StartingSizeSelectMenuMsg SelectMenu.Msg
+    | VaultMsg Vault.Msg
 
 
 init : Model
@@ -230,6 +242,7 @@ init =
     , realmOfOriginSelectMenu = SelectMenu.init
     , startingSize = Nothing
     , startingSizeSelectMenu = SelectMenu.init
+    , vault = Vault.init
     }
 
 
@@ -274,3 +287,170 @@ update msg model =
 
         StartingSizeSelectMenuMsg selectMenuMsg ->
             { model | startingSizeSelectMenu = SelectMenu.update selectMenuMsg model.startingSizeSelectMenu }
+
+        VaultMsg vaultMsg ->
+            { model | vault = Vault.update vaultMsg model.vault }
+
+
+view : List Translations -> Model -> H.Html Msg
+view translations model =
+    let
+        sectionHeight =
+            minHeight <| calc (vh 100) minus (px 32)
+    in
+    H.div
+        []
+        [ H.div
+            [ A.css
+                [ sectionHeight
+                , displayFlex
+                , alignItems center
+                , justifyContent center
+                ]
+            , A.style "page-break-after" "always"
+            ]
+            [ view_ translations model
+            ]
+        , H.div
+            [ A.css
+                [ sectionHeight
+                , displayFlex
+                , alignItems center
+                , justifyContent center
+                ]
+            , A.style "page-break-after" "always"
+            ]
+            [ view_ translations model
+            ]
+        ]
+
+
+view_ : List Translations -> Model -> H.Html Msg
+view_ translations model =
+    H.div
+        [ A.css
+            [ displayFlex
+            , flexDirection column
+            , alignItems center
+            , marginTop (px -16)
+            ]
+        ]
+    <|
+        List.map
+            (List.singleton
+                >> H.div
+                    [ A.css
+                        [ paddingTop (px 16)
+                        ]
+                    ]
+            )
+        <|
+            [ mainView translations model
+            , Vault.view translations model.vault
+                |> H.map VaultMsg
+            ]
+
+
+mainView : List Translations -> Model -> H.Html Msg
+mainView translations model =
+    let
+        textInputWrapper =
+            List.singleton
+                >> H.div
+                    [ A.css
+                        [ margin <| px 8
+                        ]
+                    ]
+    in
+    H.div
+        [ A.css
+            [ margin <| px -8
+            , displayFlex
+            , flexWrap wrap
+            ]
+        ]
+    <|
+        List.map (TextInput.view >> textInputWrapper)
+            [ { value =
+                    case model.playerName of
+                        PlayerName playerName ->
+                            playerName
+              , onChange = PlayerName >> PlayerNameChanged
+              , label = Translations.Roster.playerName translations
+              , id = "player-name"
+              }
+            , { value =
+                    case model.armyName of
+                        ArmyName armyName ->
+                            armyName
+              , onChange = ArmyName >> ArmyNameChanged
+              , label = Translations.Roster.armyName translations
+              , id = "army-name"
+              }
+            , { value =
+                    case model.faction of
+                        Faction faction ->
+                            faction
+              , onChange = Faction >> FactionChanged
+              , label = Translations.Roster.faction translations
+              , id = "faction"
+              }
+            , { value =
+                    case model.subFaction of
+                        SubFaction subFaction ->
+                            subFaction
+              , onChange = SubFaction >> SubFactionChanged
+              , label = Translations.Roster.subFaction translations
+              , id = "sub-faction"
+              }
+            ]
+            ++ List.map textInputWrapper
+                [ SelectMenu.view model.realmOfOriginSelectMenu
+                    { id = "realm-of-origin"
+                    , selectedItemLabel =
+                        Maybe.map
+                            (realmOfOriginEncoder >> EncodeX.encodeString)
+                            model.realmOfOrigin
+                    , items =
+                        [ { id = realmOfOriginId "realm-of-origin" Azir
+                          , label = Azir |> realmOfOriginEncoder |> EncodeX.encodeString
+                          , value = Azir
+                          }
+                        , { id = realmOfOriginId "realm-of-origin" Shyish
+                          , label = Shyish |> realmOfOriginEncoder |> EncodeX.encodeString
+                          , value = Shyish
+                          }
+                        ]
+                    , label = Translations.Roster.realmOfOrigin translations
+                    , onItemSelected = RealmOfOriginChanged
+                    , toMsg = RealmOfOriginSelectMenuMsg
+                    }
+                , SelectMenu.view model.startingSizeSelectMenu
+                    { id = "starting-size"
+                    , selectedItemLabel =
+                        Maybe.map
+                            (startingSizeEncoder >> EncodeX.encodeString)
+                            model.startingSize
+                    , items =
+                        [ { id = startingSizeId "starting-size" Size600
+                          , label = Size600 |> startingSizeEncoder |> EncodeX.encodeString
+                          , value = Size600
+                          }
+                        , { id = startingSizeId "starting-size" Size1000
+                          , label = Size1000 |> startingSizeEncoder |> EncodeX.encodeString
+                          , value = Size1000
+                          }
+                        , { id = startingSizeId "starting-size" Size1500
+                          , label = Size1500 |> startingSizeEncoder |> EncodeX.encodeString
+                          , value = Size1500
+                          }
+                        , { id = startingSizeId "starting-size" Size2000
+                          , label = Size2000 |> startingSizeEncoder |> EncodeX.encodeString
+                          , value = Size2000
+                          }
+                        ]
+                    , label = Translations.Roster.startingSize translations
+                    , onItemSelected = StartingSizeChanged
+                    , toMsg = StartingSizeSelectMenuMsg
+                    }
+                ]

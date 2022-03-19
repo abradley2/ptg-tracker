@@ -1,11 +1,21 @@
 {
-    "roster": {
-        "playerName": "Player Name",
-        "armyName": "Army Name",
-        "armySize": "Army Size",
-        "faction": "Faction",
-        "subFaction": "Sub Faction",
-        "realmOfOrigin": "Realm of Origin",
-        "startingSize": "Starting Size"
-    }
+  "roster": {
+    "title": "Path To Glory Roster",
+    "playerName": "Player Name",
+    "armyName": "Army Name",
+    "armySize": "Army Size",
+    "faction": "Faction",
+    "subFaction": "Sub Faction",
+    "realmOfOrigin": "Realm of Origin",
+    "startingSize": "Starting Size",
+    "currentQuest": "Current Quest",
+    "questReward": "Quest Reward",
+    "questProgress": "Quest Progress",
+    "artefactsOfPower": "Artefacts of Power",
+    "uniqueEnhancements": "Unique Enhancements",
+    "spells": "Spells",
+    "prayers": "Prayers",
+    "endlessSpellsInvocations": "Endless Spells/Invocations",
+    "battalions": "Battalions"
+  }
 }

@@ -7,6 +7,11 @@ module Translations.Roster exposing (..)
 import I18Next exposing (Delims(..), Translations, tf, trf)
 
 
+title : List Translations -> String
+title translations =
+    tf translations "roster.title"
+
+
 playerName : List Translations -> String
 playerName translations =
     tf translations "roster.playerName"
@@ -40,3 +45,48 @@ realmOfOrigin translations =
 startingSize : List Translations -> String
 startingSize translations =
     tf translations "roster.startingSize"
+
+
+currentQuest : List Translations -> String
+currentQuest translations =
+    tf translations "roster.currentQuest"
+
+
+questReward : List Translations -> String
+questReward translations =
+    tf translations "roster.questReward"
+
+
+questProgress : List Translations -> String
+questProgress translations =
+    tf translations "roster.questProgress"
+
+
+artefactsOfPower : List Translations -> String
+artefactsOfPower translations =
+    tf translations "roster.artefactsOfPower"
+
+
+uniqueEnhancements : List Translations -> String
+uniqueEnhancements translations =
+    tf translations "roster.uniqueEnhancements"
+
+
+spells : List Translations -> String
+spells translations =
+    tf translations "roster.spells"
+
+
+prayers : List Translations -> String
+prayers translations =
+    tf translations "roster.prayers"
+
+
+endlessSpellsInvocations : List Translations -> String
+endlessSpellsInvocations translations =
+    tf translations "roster.endlessSpellsInvocations"
+
+
+battalions : List Translations -> String
+battalions translations =
+    tf translations "roster.battalions"

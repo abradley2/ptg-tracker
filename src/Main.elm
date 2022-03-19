@@ -8,14 +8,11 @@ import I18Next exposing (Translations)
 import Json.Decode as Decode exposing (Decoder, Value, decodeValue)
 import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
-import Json.EncodeX as EncodeX
 import Language exposing (Language, LanguageId(..))
 import OrderOfBattle
 import Platform exposing (Program)
 import Result.Extra as ResultX
 import Roster
-import SelectMenu
-import TextInput
 import Theme
 import Translations.Roster
 
@@ -81,9 +78,7 @@ body : Model -> List (H.Html Msg)
 body model =
     [ H.div
         [ A.css
-            [ overflow hidden
-            , height <| vh 100
-            , width <| vw 100
+            [ width <| vw 100
             , backgroundColor Theme.offWhite
             ]
         ]
@@ -96,128 +91,30 @@ body model =
             [ H.div
                 [ A.css
                     [ backgroundColor Theme.lightGreen
-                    , height <| px 64
+                    , textAlign center
+                    , height <| px 32
+                    , lineHeight <| px 32
+                    , fontSize <| px 20
+                    , letterSpacing <| px 1.5
+                    , textTransform uppercase
                     ]
                 ]
-                []
+                [ H.text <| Translations.Roster.title model.translations
+                ]
             , H.div
                 [ A.css
                     [ padding <| px 16
-                    , height <| calc (vh 100) minus (px 64)
+                    , paddingTop <| px 0
+                    , height <| calc (vh 100) minus (px 32)
                     , overflow auto
                     ]
                 ]
-                [ rosterForm model.translations model.roster
+                [ Roster.view model.translations model.roster
                     |> H.map RosterMsg
                 ]
             ]
         ]
     ]
-
-
-rosterForm : List Translations -> Roster.Model -> H.Html Roster.Msg
-rosterForm translations model =
-    let
-        textInputWrapper =
-            List.singleton
-                >> H.div
-                    [ A.css
-                        [ margin <| px 8
-                        ]
-                    ]
-    in
-    H.div
-        [ A.css
-            [ margin <| px -8
-            , displayFlex
-            , flexWrap wrap
-            ]
-        ]
-    <|
-        List.map (TextInput.view >> textInputWrapper)
-            [ { value =
-                    case model.playerName of
-                        Roster.PlayerName playerName ->
-                            playerName
-              , onChange = Roster.PlayerName >> Roster.PlayerNameChanged
-              , label = Translations.Roster.playerName translations
-              , id = "player-name"
-              }
-            , { value =
-                    case model.armyName of
-                        Roster.ArmyName armyName ->
-                            armyName
-              , onChange = Roster.ArmyName >> Roster.ArmyNameChanged
-              , label = Translations.Roster.armyName translations
-              , id = "army-name"
-              }
-            , { value =
-                    case model.faction of
-                        Roster.Faction faction ->
-                            faction
-              , onChange = Roster.Faction >> Roster.FactionChanged
-              , label = Translations.Roster.faction translations
-              , id = "faction"
-              }
-            , { value =
-                    case model.subFaction of
-                        Roster.SubFaction subFaction ->
-                            subFaction
-              , onChange = Roster.SubFaction >> Roster.SubFactionChanged
-              , label = Translations.Roster.subFaction translations
-              , id = "sub-faction"
-              }
-            ]
-            ++ List.map textInputWrapper
-                [ SelectMenu.view model.realmOfOriginSelectMenu
-                    { id = "realm-of-origin"
-                    , selectedItemLabel =
-                        Maybe.map
-                            (Roster.realmOfOriginEncoder >> EncodeX.encodeString)
-                            model.realmOfOrigin
-                    , items =
-                        [ { id = Roster.realmOfOriginId "realm-of-origin" Roster.Azir
-                          , label = Roster.Azir |> Roster.realmOfOriginEncoder |> EncodeX.encodeString
-                          , value = Roster.Azir
-                          }
-                        , { id = Roster.realmOfOriginId "realm-of-origin" Roster.Shyish
-                          , label = Roster.Shyish |> Roster.realmOfOriginEncoder |> EncodeX.encodeString
-                          , value = Roster.Shyish
-                          }
-                        ]
-                    , label = Translations.Roster.realmOfOrigin translations
-                    , onItemSelected = Roster.RealmOfOriginChanged
-                    , toMsg = Roster.RealmOfOriginSelectMenuMsg
-                    }
-                , SelectMenu.view model.startingSizeSelectMenu
-                    { id = "starting-size"
-                    , selectedItemLabel =
-                        Maybe.map
-                            (Roster.startingSizeEncoder >> EncodeX.encodeString)
-                            model.startingSize
-                    , items =
-                        [ { id = Roster.startingSizeId "starting-size" Roster.Size600
-                          , label = Roster.Size600 |> Roster.startingSizeEncoder |> EncodeX.encodeString
-                          , value = Roster.Size600
-                          }
-                        , { id = Roster.startingSizeId "starting-size" Roster.Size1000
-                          , label = Roster.Size1000 |> Roster.startingSizeEncoder |> EncodeX.encodeString
-                          , value = Roster.Size1000
-                          }
-                        , { id = Roster.startingSizeId "starting-size" Roster.Size1500
-                          , label = Roster.Size1500 |> Roster.startingSizeEncoder |> EncodeX.encodeString
-                          , value = Roster.Size1500
-                          }
-                        , { id = Roster.startingSizeId "starting-size" Roster.Size2000
-                          , label = Roster.Size2000 |> Roster.startingSizeEncoder |> EncodeX.encodeString
-                          , value = Roster.Size2000
-                          }
-                        ]
-                    , label = Translations.Roster.startingSize translations
-                    , onItemSelected = Roster.StartingSizeChanged
-                    , toMsg = Roster.StartingSizeSelectMenuMsg
-                    }
-                ]
 
 
 init : Value -> ( Model, Cmd Msg )

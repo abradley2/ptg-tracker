@@ -91,10 +91,20 @@ export class SelectMenu extends HTMLElement {
           this.dispatchEvent(ev)
         }
 
+        const handleBlur = () => {
+          const ev = new CustomEvent('requestedclose')
+
+          this.dispatchEvent(ev)
+        }
+
+        const controller = document.querySelector('[aria-controls="' + this.id + '"]') as HTMLElement
+
+        controller.addEventListener('blur', handleBlur)
         document.addEventListener('keydown', handleKeyPress)
         document.addEventListener('click', handleOutsideClick)
 
         this.onDisconnect = () => {
+          controller.removeEventListener('blur', handleBlur)
           document.removeEventListener('keydown', handleKeyPress)
           document.removeEventListener('click', handleOutsideClick)
           this.onDisconnect = undefined
