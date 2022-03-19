@@ -11,6 +11,14 @@ import Json.Encode as Encode
 import Translations.Roster.Territories as Translations
 
 
+territoryInit : Territory
+territoryInit =
+    { name = TerritoryName ""
+    , territoryType = TerritoryType ""
+    , upgraded = TerritoryUpgraded False
+    }
+
+
 type alias Territory =
     { name : TerritoryName
     , territoryType : TerritoryType
@@ -77,25 +85,94 @@ territoryUpgradedEncoder (TerritoryUpgraded territoryUpgraded) =
     Encode.bool territoryUpgraded
 
 
+type StrongholdTerritories
+    = StrongholdTerritories (Array Territory)
+
+
+strongholdTerritoriesDecoder : Decoder StrongholdTerritories
+strongholdTerritoriesDecoder =
+    Decode.map StrongholdTerritories <| Decode.array territoryDecoder
+
+
+strongholdTerritoriesEncoder : StrongholdTerritories -> Value
+strongholdTerritoriesEncoder (StrongholdTerritories strongholdTerritories) =
+    Encode.array territoryEncoder strongholdTerritories
+
+
+type ImposingStrongholdTerritories
+    = ImposingStrongholdTerritories (Array Territory)
+
+
+imposingStrongholdTerritoriesDecoder : Decoder ImposingStrongholdTerritories
+imposingStrongholdTerritoriesDecoder =
+    Decode.map ImposingStrongholdTerritories <| Decode.array territoryDecoder
+
+
+imposingStrongholdTerritoriesEncoder : ImposingStrongholdTerritories -> Value
+imposingStrongholdTerritoriesEncoder (ImposingStrongholdTerritories imposingStrongholdTerritories) =
+    Encode.array territoryEncoder imposingStrongholdTerritories
+
+
+type MightyStrongholdTerritories
+    = MightyStrongholdTerritories (Array Territory)
+
+
+mightyStrongholdTerritoriesDecoder : Decoder MightyStrongholdTerritories
+mightyStrongholdTerritoriesDecoder =
+    Decode.map MightyStrongholdTerritories <| Decode.array territoryDecoder
+
+
+mightyStrongholdTerritoriesEncoder : MightyStrongholdTerritories -> Value
+mightyStrongholdTerritoriesEncoder (MightyStrongholdTerritories mightyStrongholdTerritories) =
+    Encode.array territoryEncoder mightyStrongholdTerritories
+
+
 type alias Model =
-    { strongholdTerritories : Array Territory
-    , imposingStrongholdTerritories : Array Territory
-    , mightyStrongholdTerritories : Array Territory
+    { strongholdTerritories : StrongholdTerritories
+    , imposingStrongholdTerritories : ImposingStrongholdTerritories
+    , mightyStrongholdTerritories : MightyStrongholdTerritories
     }
 
 
 modelDecoder : Decoder Model
 modelDecoder =
     Decode.succeed Model
-        |> DecodeX.andMap (Decode.array territoryDecoder |> Decode.field "strongholdTerritories")
-        |> DecodeX.andMap (Decode.array territoryDecoder |> Decode.field "imposingStrongholdTerritories")
-        |> DecodeX.andMap (Decode.array territoryDecoder |> Decode.field "mightyStrongholdTerritories")
+        |> DecodeX.andMap (Decode.field "strongholdTerritories" strongholdTerritoriesDecoder)
+        |> DecodeX.andMap (Decode.field "imposingStrongholdTerritories" imposingStrongholdTerritoriesDecoder)
+        |> DecodeX.andMap (Decode.field "mightyStrongholdTerritories" mightyStrongholdTerritoriesDecoder)
 
 
 modelEncoder : Model -> Value
 modelEncoder model =
     Encode.object
-        [ ( "strongholdTerritories", Encode.array territoryEncoder model.strongholdTerritories )
-        , ( "imposingStrongholdTerritories", Encode.array territoryEncoder model.imposingStrongholdTerritories )
-        , ( "mightyStrongholdTerritories", Encode.array territoryEncoder model.mightyStrongholdTerritories )
+        [ ( "strongholdTerritories", strongholdTerritoriesEncoder model.strongholdTerritories )
+        , ( "imposingStrongholdTerritories", imposingStrongholdTerritoriesEncoder model.imposingStrongholdTerritories )
+        , ( "mightyStrongholdTerritories", mightyStrongholdTerritoriesEncoder model.mightyStrongholdTerritories )
         ]
+
+
+type Msg
+    = StrongholdTerritoriesChanged StrongholdTerritories
+    | ImposingStrongholdTerritoriesChanged ImposingStrongholdTerritories
+    | MightyStrongholdTerritoriesChanged MightyStrongholdTerritories
+
+
+init : Model
+init =
+    { strongholdTerritories = StrongholdTerritories <| Array.repeat 3 territoryInit
+    , imposingStrongholdTerritories = ImposingStrongholdTerritories <| Array.repeat 3 territoryInit
+    , mightyStrongholdTerritories = MightyStrongholdTerritories <| Array.repeat 3 territoryInit
+    }
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        StrongholdTerritoriesChanged strongholdTerritories ->
+            { model | strongholdTerritories = strongholdTerritories }
+
+        ImposingStrongholdTerritoriesChanged imposingStrongholdTerritories ->
+            { model | imposingStrongholdTerritories = imposingStrongholdTerritories }
+
+        MightyStrongholdTerritoriesChanged mightyStrongholdTerritories ->
+            { model | mightyStrongholdTerritories = mightyStrongholdTerritories }
