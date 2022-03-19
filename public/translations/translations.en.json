@@ -17,6 +17,16 @@
     "prayers": "Prayers",
     "endlessSpellsInvocations": "Endless Spells/Invocations",
     "battalions": "Battalions",
-    "gloryPoints": "Glory Points"
+    "gloryPoints": "Glory Points",
+    "territories": {
+      "strongholdTerritoryList": "Stronghold Territories",
+      "imposingStrongholdTerritoryList": "Imposing Stronghold Territories",
+      "mightyStrongholdTerritoryList": "Mighty Stronghold Territories",
+      "stronghold": "Stronghold",
+      "territories": "Territories",
+      "strongholdName": "Name",
+      "territoryType": "Territory Type",
+      "territoryUpgraded": "Territory Upgraded"
+    }
   }
 }

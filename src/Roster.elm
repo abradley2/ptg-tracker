@@ -369,7 +369,6 @@ overviewSection translations model =
         [ A.css
             [ displayFlex
             , flexDirection column
-            , alignItems center
             , marginTop (px -16)
             ]
         ]
@@ -523,7 +522,7 @@ gloryPointsInput translations (GloryPoints gloryPoints) =
             [ H.label
                 [ A.for "glory-points"
                 , A.css
-                    [ fontSize (px 24)
+                    [ fontSize (px 20)
                     , textAlign center
                     ]
                 ]
