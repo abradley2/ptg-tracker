@@ -4,6 +4,11 @@ import Css exposing (..)
 import Css.Media as Media exposing (..)
 
 
+printScreen : List Style -> Style
+printScreen =
+    withMedia [ only print [] ]
+
+
 tabletUp : List Style -> Style
 tabletUp =
     withMedia [ only screen [ Media.minWidth (px 768) ] ]

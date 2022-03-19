@@ -86,6 +86,11 @@ body model =
             [ A.css
                 [ height <| vh 100
                 , overflow hidden
+                , Theme.printScreen
+                    [ minHeight <| vh 100
+                    , height auto
+                    , overflow visible
+                    ]
                 ]
             ]
             [ H.div
@@ -107,6 +112,11 @@ body model =
                     , paddingTop <| px 0
                     , height <| calc (vh 100) minus (px 32)
                     , overflow auto
+                    , Theme.printScreen
+                        [ height auto
+                        , minHeight <| calc (vh 100) minus (px 32)
+                        , overflow visible
+                        ]
                     ]
                 ]
                 [ Roster.view model.translations model.roster
