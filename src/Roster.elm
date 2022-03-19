@@ -309,7 +309,7 @@ view translations model =
                 ]
             , A.style "page-break-after" "always"
             ]
-            [ view_ translations model
+            [ overviewSection translations model
             ]
         , H.div
             [ A.css
@@ -320,13 +320,13 @@ view translations model =
                 ]
             , A.style "page-break-after" "always"
             ]
-            [ view_ translations model
+            [ overviewSection translations model
             ]
         ]
 
 
-view_ : List Translations -> Model -> H.Html Msg
-view_ translations model =
+overviewSection : List Translations -> Model -> H.Html Msg
+overviewSection translations model =
     H.div
         [ A.css
             [ displayFlex
