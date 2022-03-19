@@ -40,6 +40,7 @@ view config =
                 , borderBottom3 (px 1) solid Theme.darkGreen
                 , borderTop3 (px 1) solid Theme.darkGreen
                 ]
+            , A.for config.id
             ]
             [ H.text config.label
             ]

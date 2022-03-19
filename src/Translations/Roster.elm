@@ -90,3 +90,8 @@ endlessSpellsInvocations translations =
 battalions : List Translations -> String
 battalions translations =
     tf translations "roster.battalions"
+
+
+gloryPoints : List Translations -> String
+gloryPoints translations =
+    tf translations "roster.gloryPoints"

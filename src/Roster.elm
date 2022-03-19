@@ -3,6 +3,7 @@ module Roster exposing (..)
 import Accessibility.Styled as H
 import Css exposing (..)
 import Html.Styled.Attributes as A
+import Html.Styled.Events as E
 import I18Next exposing (Translations)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as DecodeX
@@ -12,7 +13,22 @@ import Roster.QuestLog as QuestLog
 import Roster.Vault as Vault
 import SelectMenu
 import TextInput
+import Theme
 import Translations.Roster
+
+
+type GloryPoints
+    = GloryPoints Int
+
+
+gloryPointsDecoder : Decoder GloryPoints
+gloryPointsDecoder =
+    Decode.map GloryPoints Decode.int
+
+
+gloryPointsEncoder : GloryPoints -> Value
+gloryPointsEncoder (GloryPoints gloryPoints) =
+    Encode.int gloryPoints
 
 
 type PlayerName
@@ -182,7 +198,8 @@ startingSizeEncoder startingSize =
 
 
 type alias Model =
-    { playerName : PlayerName
+    { gloryPoints : GloryPoints
+    , playerName : PlayerName
     , armyName : ArmyName
     , faction : Faction
     , subFaction : SubFaction
@@ -198,6 +215,7 @@ type alias Model =
 modelDecoder : Decoder Model
 modelDecoder =
     Decode.succeed Model
+        |> DecodeX.andMap (Decode.field "gloryPoints" gloryPointsDecoder)
         |> DecodeX.andMap (Decode.field "playerName" playerNameDecoder)
         |> DecodeX.andMap (Decode.field "armyName" armyNameDecoder)
         |> DecodeX.andMap (Decode.field "faction" factionDecoder)
@@ -225,7 +243,8 @@ modelEncoder model =
 
 
 type Msg
-    = PlayerNameChanged PlayerName
+    = GloryPointsChanged GloryPoints
+    | PlayerNameChanged PlayerName
     | ArmyNameChanged ArmyName
     | FactionChanged Faction
     | SubFactionChanged SubFaction
@@ -239,7 +258,8 @@ type Msg
 
 init : Model
 init =
-    { playerName = PlayerName ""
+    { gloryPoints = GloryPoints 0
+    , playerName = PlayerName ""
     , armyName = ArmyName ""
     , faction = Faction ""
     , subFaction = SubFaction ""
@@ -255,6 +275,9 @@ init =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        GloryPointsChanged gloryPoints ->
+            { model | gloryPoints = gloryPoints }
+
         PlayerNameChanged playerName ->
             { model | playerName = playerName }
 
@@ -469,3 +492,62 @@ mainView translations model =
                     , toMsg = StartingSizeSelectMenuMsg
                     }
                 ]
+            ++ [ gloryPointsInput translations model.gloryPoints
+               ]
+
+
+gloryPointsInput : List Translations -> GloryPoints -> H.Html Msg
+gloryPointsInput translations (GloryPoints gloryPoints) =
+    H.div
+        [ A.css
+            [ height <| px 74
+            , margin <| px 8
+            , display inlineFlex
+            , maxWidth <| px 160
+            , minWidth <| px 160
+            ]
+        ]
+        [ H.div
+            [ A.css
+                [ backgroundColor Theme.lightGreen
+                , color Theme.softBlack
+                , borderRight3 (px 1) solid Theme.darkGreen
+                , display inlineFlex
+                , justifyContent center
+                , alignItems center
+                , padding2 (px 0) (px 8)
+                , width <| pct 50
+                , boxSizing borderBox
+                ]
+            ]
+            [ H.label
+                [ A.for "glory-points"
+                , A.css
+                    [ fontSize (px 24)
+                    , textAlign center
+                    ]
+                ]
+                [ H.text <| Translations.Roster.gloryPoints translations
+                ]
+            ]
+        , H.inputText
+            (String.fromInt gloryPoints)
+            [ A.id "glory-points"
+            , E.onInput (String.toInt >> Maybe.withDefault 0 >> GloryPoints >> GloryPointsChanged)
+            , A.css
+                [ fontSize (px 36)
+                , height (px 74)
+                , padding2 (px 0) (px 8)
+                , boxSizing borderBox
+                , borderRadius <| px 0
+                , borderWidth <| px 0
+                , outline <| none
+                , textAlign <| center
+                , width <| pct 50
+                , focus
+                    [ outline3 (px 1) solid Theme.darkGreen
+                    ]
+                ]
+            , A.value <| String.fromInt gloryPoints
+            ]
+        ]
