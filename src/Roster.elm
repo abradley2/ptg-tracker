@@ -8,6 +8,7 @@ import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
 import Json.EncodeX as EncodeX
+import Roster.QuestLog as QuestLog
 import Roster.Vault as Vault
 import SelectMenu
 import TextInput
@@ -190,6 +191,7 @@ type alias Model =
     , startingSize : Maybe StartingSize
     , startingSizeSelectMenu : SelectMenu.Model
     , vault : Vault.Model
+    , questLog : QuestLog.Model
     }
 
 
@@ -205,6 +207,7 @@ modelDecoder =
         |> DecodeX.andMap (Decode.field "startingSize" startingSizeDecoder |> Decode.nullable)
         |> DecodeX.andMap (Decode.succeed SelectMenu.init)
         |> DecodeX.andMap (Decode.field "vault" Vault.modelDecoder)
+        |> DecodeX.andMap (Decode.field "questLog" QuestLog.modelDecoder)
 
 
 modelEncoder : Model -> Value
@@ -217,6 +220,7 @@ modelEncoder model =
         , ( "realmOfOrigin", Maybe.map realmOfOriginEncoder model.realmOfOrigin |> Maybe.withDefault Encode.null )
         , ( "startingSize", Maybe.map startingSizeEncoder model.startingSize |> Maybe.withDefault Encode.null )
         , ( "vault", Vault.modelEncoder model.vault )
+        , ( "questLog", QuestLog.modelEncoder model.questLog )
         ]
 
 
@@ -230,6 +234,7 @@ type Msg
     | StartingSizeChanged StartingSize
     | StartingSizeSelectMenuMsg SelectMenu.Msg
     | VaultMsg Vault.Msg
+    | QuestLogMsg QuestLog.Msg
 
 
 init : Model
@@ -243,6 +248,7 @@ init =
     , startingSize = Nothing
     , startingSizeSelectMenu = SelectMenu.init
     , vault = Vault.init
+    , questLog = QuestLog.init
     }
 
 
@@ -291,6 +297,9 @@ update msg model =
         VaultMsg vaultMsg ->
             { model | vault = Vault.update vaultMsg model.vault }
 
+        QuestLogMsg questLogMsg ->
+            { model | questLog = QuestLog.update questLogMsg model.questLog }
+
 
 view : List Translations -> Model -> H.Html Msg
 view translations model =
@@ -320,9 +329,15 @@ view translations model =
                 ]
             , A.style "page-break-after" "always"
             ]
-            [ overviewSection translations model
+            [ vaultSection translations model
             ]
         ]
+
+
+vaultSection : List Translations -> Model -> H.Html Msg
+vaultSection translations model =
+    Vault.view translations model.vault
+        |> H.map VaultMsg
 
 
 overviewSection : List Translations -> Model -> H.Html Msg
@@ -346,8 +361,8 @@ overviewSection translations model =
             )
         <|
             [ mainView translations model
-            , Vault.view translations model.vault
-                |> H.map VaultMsg
+            , QuestLog.view translations model.questLog
+                |> H.map QuestLogMsg
             ]
 
 

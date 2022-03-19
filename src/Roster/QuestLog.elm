@@ -18,8 +18,8 @@ type alias Model =
     }
 
 
-modelDecoder : Model -> Decoder Model
-modelDecoder _ =
+modelDecoder : Decoder Model
+modelDecoder =
     Decode.succeed Model
         |> DecodeX.andMap (Decode.field "currentQuest" currentQuestDecoder)
         |> DecodeX.andMap (Decode.field "questReward" questRewardDecoder)
