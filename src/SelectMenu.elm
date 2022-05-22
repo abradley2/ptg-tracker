@@ -94,7 +94,7 @@ view model config =
             [ Aria.controls [ menuId ]
             , Aria.labelledBy <| config.id ++ " " ++ config.id ++ "-selection"
             , Aria.hasListBoxPopUp
-            , E.onClick <| config.toMsg (MenuToggled <| not model.menuOpen)
+            
             , A.css
                 [ minHeight <| px 38
                 , maxHeight <| px 38
@@ -163,6 +163,7 @@ view model config =
 
                 else
                     "false"
+            , E.on "requestedopen" (Decode.succeed <| config.toMsg (MenuToggled True))
             , E.on "requestedclose" (Decode.succeed <| config.toMsg (MenuToggled False))
             , E.on "focusindexchanged" (Decode.map (FocusIndexChanged >> config.toMsg) (Decode.field "detail" Decode.int))
             , E.on "itemselected"
