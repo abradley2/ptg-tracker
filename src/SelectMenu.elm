@@ -157,6 +157,7 @@ view model config =
                 , zIndex <| int 1
                 ]
             , focusMenuClass model.menuOpen
+            , A.attribute "focusindex" (String.fromInt model.focusIndex)
             , A.attribute "show" <|
                 if model.menuOpen then
                     "true"

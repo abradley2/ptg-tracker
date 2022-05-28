@@ -1,4 +1,5 @@
 export class SelectMenu extends HTMLElement {
+  onHide?: () => void
   onDisconnect?: () => void
   focusIndex: number
   controller: HTMLElement & HTMLButtonElement
@@ -14,7 +15,8 @@ export class SelectMenu extends HTMLElement {
   }
 
   disconnectedCallback(): void {
-    if (this.onDisconnect != null) this.onDisconnect()
+    if (this.onHide) this.onHide()
+    if (this.onDisconnect) this.onDisconnect()
   }
 
   connectedCallback(): void {
@@ -63,6 +65,14 @@ export class SelectMenu extends HTMLElement {
     this.controller.addEventListener('mousedown', onMenuClick)
     this.controller.addEventListener('focus', handleFocus)
     this.controller.addEventListener('blur', handleBlur)
+
+    this.onDisconnect = () => {
+      console.log('DETACH LISTENERS')
+      this.controller.removeEventListener('touchstart', onMenuClick)
+      this.controller.removeEventListener('mousedown', onMenuClick)
+      this.controller.removeEventListener('focus', handleFocus)
+      this.controller.removeEventListener('blur', handleBlur)
+    }
   }
 
   attributeChangedCallback(name: string, oldVal: string, newVal: string): void {
@@ -73,9 +83,9 @@ export class SelectMenu extends HTMLElement {
       this.focusIndex = -1
 
       if (!show) {
-        if (this.onDisconnect != null) {
-          this.onDisconnect()
-          this.onDisconnect = undefined
+        if (this.onHide) {
+          this.onHide()
+          this.onHide = undefined
         }
       }
 
@@ -131,7 +141,7 @@ export class SelectMenu extends HTMLElement {
         }
 
 
-        const handleBlur = () => {
+        const handleBlur = (e: any) => {
           const ev = new CustomEvent('requestedclose')
 
           this.dispatchEvent(ev)
@@ -140,10 +150,10 @@ export class SelectMenu extends HTMLElement {
         this.controller.addEventListener('blur', handleBlur)
         document.addEventListener('keydown', handleKeyPress)
 
-        this.onDisconnect = () => {
+        this.onHide = () => {
           this.controller.removeEventListener('blur', handleBlur)
           document.removeEventListener('keydown', handleKeyPress)
-          this.onDisconnect = undefined
+          this.onHide = undefined
         }
       }
     }
