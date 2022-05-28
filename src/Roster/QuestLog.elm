@@ -111,6 +111,7 @@ view translations model =
             [ displayFlex
             , flexWrap wrap
             , margin <| px -8
+            , justifyContent center
             ]
         ]
     <|

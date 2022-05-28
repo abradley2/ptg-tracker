@@ -404,6 +404,7 @@ mainView translations model =
             [ margin <| px -8
             , displayFlex
             , flexWrap wrap
+            , justifyContent center
             ]
         ]
     <|
