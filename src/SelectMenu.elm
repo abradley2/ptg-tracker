@@ -94,7 +94,6 @@ view model config =
             [ Aria.controls [ menuId ]
             , Aria.labelledBy <| config.id ++ " " ++ config.id ++ "-selection"
             , Aria.hasListBoxPopUp
-            
             , A.css
                 [ minHeight <| px 38
                 , maxHeight <| px 38
@@ -198,7 +197,6 @@ option config model index optionConfig =
         [ Role.option
         , A.id optionConfig.id
         , A.tabindex <| -1
-        , E.onClick (config.onItemSelected optionConfig.value)
         , A.css <|
             [ width <| pct 100
             , backgroundColor Theme.white

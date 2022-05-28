@@ -4,7 +4,7 @@ export class SelectMenu extends HTMLElement {
   focusIndex: number
   controller: HTMLElement & HTMLButtonElement
 
-  constructor () {
+  constructor() {
     super()
     this.controller = document.querySelector('[aria-controls="' + this.id + '"]') as HTMLElement & HTMLButtonElement
     this.focusIndex = -1
@@ -22,6 +22,28 @@ export class SelectMenu extends HTMLElement {
   connectedCallback(): void {
     this.controller = document.querySelector('[aria-controls="' + this.id + '"]') as HTMLElement & HTMLButtonElement
     this.setAttribute('tabindex', '-1')
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.target && (e.target as HTMLElement).getAttribute('role') === 'option') {
+        const idx = Array.from(this.children).indexOf(e.target as HTMLElement)
+
+        const ev = new CustomEvent('itemselected', {
+          bubbles: true,
+          detail: idx
+        })
+
+        this.dispatchEvent(ev)
+
+        // allow the input to blur, but then refocus it
+        requestAnimationFrame(() => {
+          this.controller.focus()
+        })
+      }
+    }
+
+    const onTouchStart = (e: unknown) => {
+      onMouseDown(e as MouseEvent)
+    }
 
     let onKeyDown: undefined | ((e: KeyboardEvent) => void)
     const onMenuClick = () => {
@@ -65,9 +87,12 @@ export class SelectMenu extends HTMLElement {
     this.controller.addEventListener('mousedown', onMenuClick)
     this.controller.addEventListener('focus', handleFocus)
     this.controller.addEventListener('blur', handleBlur)
+    this.addEventListener('touchstart', onTouchStart)
+    this.addEventListener('mousedown', onMouseDown)
 
     this.onDisconnect = () => {
-      console.log('DETACH LISTENERS')
+      this.removeEventListener('touchstart', onTouchStart)
+      this.removeEventListener('mousedown', onMouseDown)
       this.controller.removeEventListener('touchstart', onMenuClick)
       this.controller.removeEventListener('mousedown', onMenuClick)
       this.controller.removeEventListener('focus', handleFocus)
