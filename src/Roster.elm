@@ -10,6 +10,7 @@ import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
 import Json.EncodeX as EncodeX
 import Roster.QuestLog as QuestLog
+import Roster.Territories as Territories
 import Roster.Vault as Vault
 import SelectMenu
 import TextInput
@@ -209,6 +210,7 @@ type alias Model =
     , startingSizeSelectMenu : SelectMenu.Model
     , vault : Vault.Model
     , questLog : QuestLog.Model
+    , territories : Territories.Model
     }
 
 
@@ -226,6 +228,7 @@ modelDecoder =
         |> DecodeX.andMap (Decode.succeed SelectMenu.init)
         |> DecodeX.andMap (Decode.field "vault" Vault.modelDecoder)
         |> DecodeX.andMap (Decode.field "questLog" QuestLog.modelDecoder)
+        |> DecodeX.andMap (Decode.field "territories" Territories.modelDecoder)
 
 
 modelEncoder : Model -> Value
@@ -239,6 +242,7 @@ modelEncoder model =
         , ( "startingSize", Maybe.map startingSizeEncoder model.startingSize |> Maybe.withDefault Encode.null )
         , ( "vault", Vault.modelEncoder model.vault )
         , ( "questLog", QuestLog.modelEncoder model.questLog )
+        , ( "territories", Territories.modelEncoder model.territories )
         ]
 
 
@@ -254,6 +258,7 @@ type Msg
     | StartingSizeSelectMenuMsg SelectMenu.Msg
     | VaultMsg Vault.Msg
     | QuestLogMsg QuestLog.Msg
+    | TerritoriesMsg Territories.Msg
 
 
 init : Model
@@ -269,6 +274,7 @@ init =
     , startingSizeSelectMenu = SelectMenu.init
     , vault = Vault.init
     , questLog = QuestLog.init
+    , territories = Territories.init
     }
 
 
@@ -323,6 +329,9 @@ update msg model =
         QuestLogMsg questLogMsg ->
             { model | questLog = QuestLog.update questLogMsg model.questLog }
 
+        TerritoriesMsg territoriesMsg ->
+            { model | territories = Territories.update territoriesMsg model.territories }
+
 
 view : List Translations -> Model -> H.Html Msg
 view translations model =
@@ -354,13 +363,28 @@ view translations model =
             ]
             [ vaultSection translations model
             ]
+        , H.div
+            [ A.css
+                [ sectionHeight
+                , displayFlex
+                , alignItems center
+                , justifyContent center
+                ]
+            , A.style "page-break-after" "always"
+            ]
+            [ territoriesSection translations model
+            ]
         ]
 
 
+territoriesSection : List Translations -> Model -> H.Html Msg
+territoriesSection translations =
+    .territories >> Territories.view translations >> H.map TerritoriesMsg
+
+
 vaultSection : List Translations -> Model -> H.Html Msg
-vaultSection translations model =
-    Vault.view translations model.vault
-        |> H.map VaultMsg
+vaultSection translations =
+    .vault >> Vault.view translations >> H.map VaultMsg
 
 
 overviewSection : List Translations -> Model -> H.Html Msg

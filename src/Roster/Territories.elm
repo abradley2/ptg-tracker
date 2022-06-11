@@ -8,6 +8,7 @@ import I18Next exposing (Translations)
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Decode.Extra as DecodeX
 import Json.Encode as Encode
+import Theme
 import Translations.Roster.Territories as Translations
 
 
@@ -176,3 +177,37 @@ update msg model =
 
         MightyStrongholdTerritoriesChanged mightyStrongholdTerritories ->
             { model | mightyStrongholdTerritories = mightyStrongholdTerritories }
+
+
+view : List Translations -> Model -> H.Html Msg
+view translations model =
+    H.div
+        []
+        [ territoryList
+            translations
+            (Translations.imposingStrongholdTerritoryList translations)
+            (StrongholdTerritories >> StrongholdTerritoriesChanged)
+            (case model.strongholdTerritories of
+                StrongholdTerritories strongholdTerritories ->
+                    strongholdTerritories
+            )
+        ]
+
+
+territoryList : List Translations -> String -> (Array Territory -> Msg) -> Array Territory -> H.Html Msg
+territoryList translations title onTerritoryChanged territories =
+    H.div
+        []
+        [ H.div
+            [ A.css
+                [ backgroundColor Theme.lightGreen
+                , borderTop3 (px 1) solid Theme.darkGreen
+                , borderBottom3 (px 1) solid Theme.darkGreen
+                , padding2 (px 8) (px 16)
+                , paddingRight <| px 44
+                , position relative
+                ]
+            ]
+            [ H.text title
+            ]
+        ]
